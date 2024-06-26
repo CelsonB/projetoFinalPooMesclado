@@ -1,18 +1,14 @@
 package dao;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import entities.Agenda;
 import entities.Compromisso;
-import entities.Usuario;
 
 public class CompromissoDAO {
 
@@ -21,54 +17,44 @@ public class CompromissoDAO {
 	public CompromissoDAO(Connection conn) {
 		this.conn = conn;
 	}
-	
-	
-	
-	public List<Compromisso> verificarCompromissos(Usuario sessao) throws SQLException {
-		List<Compromisso> listaCompromissos = new ArrayList<>();
+
+	public List<Compromisso> verificarCompromisso(int idUsuario) throws SQLException {
+
 		PreparedStatement st = null;
-		ResultSet result = null;
-		
-				
-				try {
-					java.util.Date utilDate = new java.util.Date();
-					 
-				
-				
-					st = this.conn.prepareStatement
-						("SELECT * FROM compromisso INNER JOIN agenda ON agenda.usuario_id = compromisso.usuario_id WHERE compromisso.usuario_id = ? AND notificacao <= NOW()");
-					st.setInt(1, sessao.getIdUsuario());
-					result = st.executeQuery();
-					
-					while(result.next()) {
-						Compromisso compromisso = new Compromisso();
-						compromisso.setIdCompromisso(result.getInt("id"));
-						compromisso.setTitulo(result.getString("titulo"));
-						compromisso.setDescricao(result.getString("descricao"));
-						compromisso.setTitulo(result.getString("titulo"));
-						compromisso.setDataInicio(result.getTimestamp("data_inicio"));
-						compromisso.setDataTermino(result.getTimestamp("data_termino"));
-						compromisso.setNotificacao(result.getTimestamp("notificacao"));
-						compromisso.setLocal(result.getString("local"));
-						listaCompromissos.add(compromisso);
-					}
-					
-					return listaCompromissos;
-				}catch(Exception ex) {
-					System.out.println(ex.getMessage());
-				}finally {
-					BancoDados.finalizarStatement(st);
-					BancoDados.finalizarResultSet(result);
-					BancoDados.desconectar();
-				}
-				return listaCompromissos;
-				
-			}
+		ResultSet rs = null;
+
+		try {
+
+			st = this.conn.prepareStatement(
+					"select * from compromisso inner join agenda on agenda.usuario_id = compromisso.usuario_id where compromisso.usuario_id = ? and notificacao <= NOW()");
+			st.setInt(1, idUsuario);
+			rs = st.executeQuery();
+
+			List<Compromisso> listaCompromissos = new ArrayList<>();
 			
-	
-	
-	
-	
+			while (rs.next()) {
+				Compromisso compromisso = new Compromisso();
+				compromisso.setIdCompromisso(rs.getInt("id"));
+				compromisso.setTitulo(rs.getString("titulo"));
+				compromisso.setDescricao(rs.getString("descricao"));
+				compromisso.setTitulo(rs.getString("titulo"));
+				compromisso.setDataInicio(rs.getTimestamp("data_inicio"));
+				compromisso.setDataTermino(rs.getTimestamp("data_termino"));
+				compromisso.setNotificacao(rs.getTimestamp("notificacao"));
+				compromisso.setLocal(rs.getString("local"));
+				listaCompromissos.add(compromisso);
+			}
+
+			return listaCompromissos;
+
+		} finally {
+
+			BancoDados.finalizarStatement(st);
+			BancoDados.finalizarResultSet(rs);
+			BancoDados.desconectar();
+		}
+	}
+
 
 	public void cadastrarCompromisso(Compromisso compromisso, int idUsuario) throws SQLException {
 
@@ -163,14 +149,6 @@ public class CompromissoDAO {
 		}
 	}
 	
-	public void importarCompromissos() {
-		
-	}
-
-	public void exportarCompromissos() {
-		
-	}
-	
 	public Compromisso buscarCompromisso(int idCompromisso) throws SQLException {
 
 		PreparedStatement st = null;
@@ -225,7 +203,6 @@ public class CompromissoDAO {
 		ResultSet rs = null;
 
 		try {
-
 			st = conn.prepareStatement(
 					"select compromisso_id from compromisso_convidados where usuario_id = ? and convite = 0");
 			st.setInt(1, idUsuario);
@@ -235,9 +212,9 @@ public class CompromissoDAO {
 			List<Compromisso> convites = new ArrayList<>();
 			ResultSet rs2 = null;
 
-			while (rs.next()) {
+			if (rs.next()) {
 				st = conn.prepareStatement("select * from compromisso where id = ?");
-				st.setInt(1, rs.getInt("compromisso_id"));
+				st.setInt(1, rs.getInt("compromisso_id")); 
 				rs2 = st.executeQuery();
 
 				if (rs2.next()) {
@@ -264,13 +241,12 @@ public class CompromissoDAO {
 
 					convite.setConvidados(convidados);
 					convites.add(convite);
-				}
+				}	
 			}
 
 			return convites;
 
 		} finally {
-
 			BancoDados.finalizarStatement(st);
 			BancoDados.finalizarResultSet(rs);
 			BancoDados.desconectar();
@@ -285,7 +261,7 @@ public class CompromissoDAO {
 			st = conn
 					.prepareStatement("delete from compromisso_convidados where compromisso_id = ? and usuario_id = ?");
 			st.setInt(1, idCompromisso);
-			st.setInt(1, idUsuario);
+			st.setInt(2, idUsuario);
 
 			st.executeUpdate();
 
@@ -301,11 +277,10 @@ public class CompromissoDAO {
 		PreparedStatement st = null;
 
 		try {
-
 			st = conn.prepareStatement(
-					"update compromisso_convidados where compromisso_id = ? and usuario_id = ? set convite = 1");
+					"update compromisso_convidados set convite = 1 where compromisso_id = ? and usuario_id = ? ");
 			st.setInt(1, idCompromisso);
-			st.setInt(1, idUsuario);
+			st.setInt(2, idUsuario);
 
 			st.executeUpdate();
 

@@ -3,11 +3,14 @@ package gui;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +69,10 @@ public class CompromissoWindow extends JFrame {
 	}
 
 	private void editarCompromisso() {
+		if (this.tblCompromissos.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(null, "Selecione uma linha na tabela", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 		this.dispose();
 		CadastrarCompromissoWindow editar = new CadastrarCompromissoWindow(agenda);
 		editar.preencherCampos(this.buscarCompromisso((int) tblCompromissos.getValueAt(tblCompromissos.getSelectedRow(),
@@ -106,6 +113,10 @@ public class CompromissoWindow extends JFrame {
 	}
 
 	private void visualizarConvidados() {
+		if (this.tblCompromissos.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(null, "Selecione uma linha na tabela", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 		Compromisso compromisso = this.buscarCompromisso((int) tblCompromissos
 				.getValueAt(tblCompromissos.getSelectedRow(), tblCompromissos.getColumnModel().getColumnIndex("ID")));
 		String convidados = "Convidados: ";
@@ -116,42 +127,73 @@ public class CompromissoWindow extends JFrame {
 	}
 	
 	private void importarCompromissos() {
-		
+		try {
+
+			JFileChooser seletor = new JFileChooser();
+			FileNameExtensionFilter filtro = new FileNameExtensionFilter("Documento CSV (*.csv)", "csv");
+			seletor.setFileFilter(filtro);
+			int retorno = seletor.showOpenDialog(null);
+
+			if (retorno == JFileChooser.APPROVE_OPTION) {
+				File csvFile = seletor.getSelectedFile();
+
+				BufferedReader br = new BufferedReader(new FileReader(csvFile));
+				String linha;
+				br.readLine();
+
+				while ((linha = br.readLine()) != null) {
+					Compromisso compromisso = new Compromisso();
+
+					String[] valores = linha.split(",");
+
+					compromisso.setTitulo(valores[0]);
+					compromisso.setDescricao(valores[1]);
+					compromisso.setDataInicio(Timestamp.valueOf(valores[2]));
+					compromisso.setDataTermino(Timestamp.valueOf(valores[3]));
+					compromisso.setLocal(valores[4]);
+					compromisso.setAgenda(agenda);
+
+					compromissoService.cadastrarCompromisso(compromisso, Sessao.getUsuario().getIdUsuario());
+				}
+				JOptionPane.showMessageDialog(this, "Compromissos salvos!", "Sucesso!",
+						JOptionPane.INFORMATION_MESSAGE);
+			}
+
+			buscarCompromissos();
+
+		} catch (SQLException | IOException e) {
+			JOptionPane.showMessageDialog(this, "Erro ao importar compromissos", "Erro", JOptionPane.ERROR_MESSAGE);
+		}
+
 	}
 
 	private void exportarCompromissos() {
 		try {
-			
+
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setDialogTitle("Salvar Compromissos em CSV");
-			fileChooser.setSelectedFile(new File("Agenda"+agenda.getNome()+".csv"));
+			fileChooser.setSelectedFile(new File("Compromissos" + ".csv"));
 			fileChooser.setFileFilter(new FileNameExtensionFilter("Arquivo .CSV", "csv", "text"));
-			
+
 			int userSelection = fileChooser.showSaveDialog(null);
 			if (userSelection == JFileChooser.APPROVE_OPTION) {
 				File fileToSave = fileChooser.getSelectedFile();
 
-				BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave));		
-				writer.write("ID Compromisso,Título,Descrição,Data Início,Data Término,Local,Agenda ID,Agenda Nome,Agenda Descrição\n");
+				BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave));
+				writer.write("Título,Descrição,Data Início,Data Término,Local,Agenda Nome\n");
 
-                for (Compromisso compromisso : compromissos) {
-                	
-                	String dataInicio = sdf.format(compromisso.getDataInicio());
-    				String dataTermino = sdf.format(compromisso.getDataTermino());
-    				
-                    writer.write(compromisso.getIdCompromisso() + ",");
-                    writer.write(compromisso.getTitulo() + ",");
-                    writer.write(compromisso.getDescricao() + ",");
-                    writer.write(dataInicio + ",");
-                    writer.write(dataTermino + ",");
-                    writer.write(compromisso.getLocal() + ",");
-                    writer.write(agenda.getIdAgenda() + ",");
-                    writer.write(agenda.getNome() + ",");
-                    writer.write(agenda.getDescricao() + ",");
-                    writer.newLine();
-                }
-                
-                writer.close();
+				for (Compromisso compromisso : compromissos) {
+
+					writer.write(compromisso.getTitulo() + ",");
+					writer.write(compromisso.getDescricao() + ",");
+					writer.write(compromisso.getDataInicio() + ",");
+					writer.write(compromisso.getDataTermino() + ",");
+					writer.write(compromisso.getLocal() + ",");
+					writer.write(agenda.getNome() + ",");
+					writer.newLine();
+				}
+
+				writer.close();
 				JOptionPane.showMessageDialog(this, "Compromissos salvos!", "Sucesso!",
 						JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -163,6 +205,10 @@ public class CompromissoWindow extends JFrame {
 
 	private void excluirCompromisso() {
 		try {
+			if (this.tblCompromissos.getSelectedRow() == -1) {
+	            JOptionPane.showMessageDialog(null, "Selecione uma linha na tabela", "Erro", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
 			int op = JOptionPane.showConfirmDialog(null, "Deseja excluir esse compromisso?", "Confirmar exclusão",
 					JOptionPane.YES_NO_OPTION);
 			if (op == 0) {
@@ -254,7 +300,7 @@ public class CompromissoWindow extends JFrame {
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				new PerfilWindow(Sessao.getUsuario()).setVisible(true);
+				new PerfilWindow().setVisible(true);
 			}
 		});
 		btnVoltar.setFont(new Font("Tahoma", Font.PLAIN, 14));

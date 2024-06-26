@@ -25,6 +25,7 @@ import javax.swing.table.DefaultTableModel;
 import entities.Agenda;
 import entities.Compromisso;
 import entities.Sessao;
+import service.AgendaService;
 import service.CompromissoService;
 
 public class ConvitesWindow extends JFrame {
@@ -44,9 +45,9 @@ public class ConvitesWindow extends JFrame {
 	private List<Agenda> agendas = new ArrayList<>();
 
 	public ConvitesWindow(List<Agenda> agendas) {
+		this.agendas = agendas;
 		initComponents();
 		buscarConvites();
-		this.agendas = agendas;
 	}
 
 	private void buscarConvites() {
@@ -68,44 +69,53 @@ public class ConvitesWindow extends JFrame {
 						dataInicio, dataTermino, convite.getLocal() });
 			}
 		} catch (SQLException | IOException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Erro ao obter convites", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	private void aceitarConvite() {
 		try {
-			
+
 			JComboBox<Agenda> comboBox = new JComboBox<>();
 			DefaultComboBoxModel<Agenda> model = new DefaultComboBoxModel();
-			
-			for(Agenda agenda : agendas) {
-				model.addElement(agenda);
-			}
-			
-			comboBox.setModel(model);
 
-			Object[] mensagem = { "Selecione uma agenda:", comboBox };
-
-			int option = JOptionPane.showConfirmDialog(null, mensagem, "Escolha uma agenda", JOptionPane.OK_CANCEL_OPTION);
-
-			if (option == JOptionPane.OK_OPTION) {
-				Agenda agendaSelecionada = (Agenda) comboBox.getSelectedItem();
-				
-				for (Compromisso convite : convites) {
-					if (convite.getIdCompromisso() == ((Integer) tblConvites.getValueAt(tblConvites.getSelectedRow(),
-							tblConvites.getColumnModel().getColumnIndex("ID")))) {
-						convite.setAgenda(agendaSelecionada);
-						compromissoService.cadastrarCompromisso(convite, Sessao.getUsuario().getIdUsuario());
-					}
+			if (!agendas.isEmpty()) {
+				for (Agenda agenda : agendas) {
+					model.addElement(agenda);
 				}
-				
-				JOptionPane.showMessageDialog(this, "Compromisso salvo com sucesso!", "Sucesso!",JOptionPane.INFORMATION_MESSAGE);
+
+				comboBox.setModel(model);
+
+				Object[] mensagem = { "Selecione uma agenda:", comboBox };
+
+				int option = JOptionPane.showConfirmDialog(null, mensagem, "Escolha uma agenda",
+						JOptionPane.OK_CANCEL_OPTION);
+
+				if (option == JOptionPane.OK_OPTION) {
+					Agenda agendaSelecionada = (Agenda) comboBox.getSelectedItem();
+
+					for (Compromisso convite : convites) {
+						if (convite.getIdCompromisso() == ((Integer) tblConvites.getValueAt(
+								tblConvites.getSelectedRow(), tblConvites.getColumnModel().getColumnIndex("ID")))) {
+							convite.setAgenda(agendaSelecionada);
+							convite.setConvidados(null);
+							compromissoService.aceitarConvite(convite.getIdCompromisso(), Sessao.getUsuario().getIdUsuario());
+							compromissoService.cadastrarCompromisso(convite, Sessao.getUsuario().getIdUsuario());
+						}
+					}
+
+					JOptionPane.showMessageDialog(this, "Compromisso salvo com sucesso!", "Sucesso!",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+				buscarConvites();
+			}else {
+				JOptionPane.showMessageDialog(this, "Crie uma agenda para adicionar seu compromisso!", "Agenda não encontrada",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 
-			buscarConvites();
-			
 		} catch (SQLException | IOException e) {
-
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Erro ao salvar compromisso", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -117,12 +127,13 @@ public class ConvitesWindow extends JFrame {
 			if (idCompromisso != -1) {
 				compromissoService.recusarConvite(idCompromisso, Sessao.getUsuario().getIdUsuario());
 			} else {
-				JOptionPane.showMessageDialog(null, "Seleciona uma linha da tabela!", null,
+				JOptionPane.showMessageDialog(null, "Selecione uma linha da tabela!", null,
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 			buscarConvites();
 
 		} catch (SQLException | IOException e) {
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Erro ao recusar convite", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -189,7 +200,7 @@ public class ConvitesWindow extends JFrame {
 		btnVoltar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				new PerfilWindow(Sessao.getUsuario()).setVisible(true);
+				new AgendaWindow().setVisible(true);
 			}
 		});
 		btnVoltar.setFont(new Font("Tahoma", Font.PLAIN, 14));

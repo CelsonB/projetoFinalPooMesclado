@@ -39,8 +39,8 @@ public class AgendaWindow extends JFrame {
 	private JButton btnAbrir;
 	
 	private AgendaService agendaService = new AgendaService();
-	private JButton btnConvites;
 	private List<Agenda> agendas = new ArrayList<>();
+	private JButton btnConvites;
 	
 	public AgendaWindow() {
 		initComponents();
@@ -70,18 +70,21 @@ public class AgendaWindow extends JFrame {
 	}
 	
 	private void abrirAgenda() {
+		if (this.tblAgendas.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(null, "Selecione uma linha na tabela", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+		
 		Agenda agenda = this.salvarAgenda();
 		this.dispose();
 		new CompromissoWindow(agenda).setVisible(true);
 	}
-	
-	private void abrirConvites() {
-		dispose();
-		new ConvitesWindow(this.agendas).setVisible(true);
-	}
 
 	private void editarAgenda() {
-		
+		if (this.tblAgendas.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(null, "Selecione uma linha na tabela", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 		Agenda agenda = this.salvarAgenda();
 		CadastrarAgendaWindow edicao = new CadastrarAgendaWindow();
 		edicao.preencherCampos(agenda);
@@ -103,6 +106,10 @@ public class AgendaWindow extends JFrame {
 
 	private void excluirAgenda() {
 		try {
+			if (this.tblAgendas.getSelectedRow() == -1) {
+	            JOptionPane.showMessageDialog(null, "Selecione uma linha na tabela", "Erro", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
 			int op = JOptionPane.showConfirmDialog(null, "Deseja excluir esta agenda?", "Confirmar exclusão", JOptionPane.YES_NO_OPTION);
 			if (op == 0) {
 				op = agendaService.excluirAgenda((Integer) tblAgendas.getValueAt(tblAgendas.getSelectedRow(), tblAgendas.getColumnModel().getColumnIndex("ID")));
@@ -116,10 +123,15 @@ public class AgendaWindow extends JFrame {
 			JOptionPane.showMessageDialog(this, "Erro ao excluir agenda", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	private void abrirConvites() {
+		this.dispose();
+		new ConvitesWindow(this.agendas).setVisible(true);
+	}
 
 	private void voltar() {
 		this.dispose();
-		new PerfilWindow(Sessao.getUsuario()).setVisible(true);
+		new PerfilWindow().setVisible(true);
 	}
 
 	private void initComponents() {
@@ -226,8 +238,9 @@ public class AgendaWindow extends JFrame {
 			}
 		});
 		btnConvites.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnConvites.setBounds(521, 358, 95, 23);
+		btnConvites.setBounds(626, 196, 101, 23);
 		contentPane.add(btnConvites);
+
 
 		setLocationRelativeTo(null);
 	}

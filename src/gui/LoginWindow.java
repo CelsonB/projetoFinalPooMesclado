@@ -51,10 +51,9 @@ public class LoginWindow extends JFrame {
 			}else {
 				Sessao.setUsuario(usuario);
 				this.dispose();
-				new PerfilWindow(Sessao.getUsuario()).setVisible(true);
+				new PerfilWindow().setVisible(true);
 			}
 		} catch (SQLException | IOException e) {
-			System.out.println(e.getMessage());
 			JOptionPane.showMessageDialog(null, "Erro ao realizar login", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}

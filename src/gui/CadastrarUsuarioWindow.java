@@ -119,7 +119,7 @@ public class CadastrarUsuarioWindow extends JFrame {
 			JOptionPane.showMessageDialog(this, "Cadastro atualizado com sucesso!", "Sucesso!",
 					JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
-			new PerfilWindow(Sessao.getUsuario()).setVisible(true);
+			new PerfilWindow().setVisible(true);
 
 		} catch (ParseException | SQLException | IOException e) {
 			JOptionPane.showMessageDialog(this, "Erro ao realizar cadastro", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -219,9 +219,9 @@ public class CadastrarUsuarioWindow extends JFrame {
 	private void voltar() {
 		this.dispose();
 		if(Sessao.getUsuario()==null) {
-			new InicioWindow().setVisible(true);
+			new LoginWindow().setVisible(true);
 		}else {
-			new PerfilWindow(Sessao.getUsuario()).setVisible(true);
+			new PerfilWindow().setVisible(true);
 		}
 		
 	}
@@ -232,7 +232,7 @@ public class CadastrarUsuarioWindow extends JFrame {
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
 				this.setTitle("EDITAR");
-				this.lblTitulo.setText("EDITAR USUÃaRIO");
+				this.lblTitulo.setText("EDITAR USUï¿½aRIO");
 				this.btnCadastrar.setText("Salvar");
 				this.btnExcluir.setVisible(true);
 				this.btnExcluir.setEnabled(true);
@@ -365,7 +365,7 @@ public class CadastrarUsuarioWindow extends JFrame {
 		btnCadastrar.setBounds(222, 448, 129, 23);
 		contentPane.add(btnCadastrar);
 
-		lblTitulo = new JLabel("CADASTRAR NOVO USUÃaRIO");
+		lblTitulo = new JLabel("CADASTRAR NOVO USUï¿½aRIO");
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblTitulo.setBounds(20, 11, 340, 20);
 		contentPane.add(lblTitulo);

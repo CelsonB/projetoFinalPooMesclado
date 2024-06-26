@@ -1,7 +1,7 @@
 
-CREATE DATABASE projetofinalnicole;
+CREATE DATABASE projetofinaloo2;
 
-USE projetofinalnicole;
+USE projetofinaloo2;
 
 CREATE TABLE usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
