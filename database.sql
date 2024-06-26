@@ -39,6 +39,7 @@ CREATE TABLE compromisso (
 CREATE TABLE compromisso_convidados (
     compromisso_id INT,
     usuario_id INT,
+    convite INT DEFAULT 0,
     PRIMARY KEY (compromisso_id, usuario_id),
     FOREIGN KEY (compromisso_id) REFERENCES compromisso(id) ON DELETE CASCADE,
     FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
