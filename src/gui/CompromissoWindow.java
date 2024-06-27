@@ -186,12 +186,12 @@ public class CompromissoWindow extends JFrame {
 
 				for (Compromisso compromisso : compromissos) {
 
-					writer.write(compromisso.getTitulo() + ",");
-					writer.write(compromisso.getDescricao() + ",");
-					writer.write(compromisso.getDataInicio() + ",");
-					writer.write(compromisso.getDataTermino() + ",");
-					writer.write(compromisso.getLocal() + ",");
-					writer.write(agenda.getNome() + ",");
+					writer.write("\"" + compromisso.getTitulo() + "\",");
+					writer.write("\"" + compromisso.getDescricao() + "\",");
+					writer.write("\"" + compromisso.getDataInicio() + "\",");
+					writer.write("\"" + compromisso.getDataTermino() + "\",");
+					writer.write("\"" + compromisso.getLocal() + "\",");
+					writer.write("\"" + agenda.getNome() + "\",");
 					writer.newLine();
 				}
 
