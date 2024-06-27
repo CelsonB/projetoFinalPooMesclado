@@ -170,16 +170,33 @@ public class ConvitesWindow extends JFrame {
 
 		tblConvites = new JTable();
 		tblConvites.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		tblConvites.setModel(new DefaultTableModel(new Object[][] {},
-				new String[] { "ID", "T\u00EDtulo", "Descri\u00E7\u00E3o", "Inicio", "T\u00E9rmino", "Local" }) {
-			Class[] columnTypes = new Class[] { Integer.class, String.class, String.class, String.class, String.class,
-					String.class };
-
+		tblConvites.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"ID", "T\u00EDtulo", "Descri\u00E7\u00E3o", "Inicio", "T\u00E9rmino", "Local"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				Integer.class, String.class, String.class, String.class, String.class, String.class
+			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
+			boolean[] columnEditables = new boolean[] {
+				false, false, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
 		});
+		tblConvites.getColumnModel().getColumn(0).setResizable(false);
 		tblConvites.getColumnModel().getColumn(0).setPreferredWidth(15);
+		tblConvites.getColumnModel().getColumn(1).setResizable(false);
+		tblConvites.getColumnModel().getColumn(2).setResizable(false);
+		tblConvites.getColumnModel().getColumn(3).setResizable(false);
+		tblConvites.getColumnModel().getColumn(4).setResizable(false);
+		tblConvites.getColumnModel().getColumn(5).setResizable(false);
 		scrollPane.setViewportView(tblConvites);
 
 		btnAceitar = new JButton("Aceitar");

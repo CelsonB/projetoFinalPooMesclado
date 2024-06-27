@@ -245,17 +245,34 @@ public class CompromissoWindow extends JFrame {
 
 		tblCompromissos = new JTable();
 		tblCompromissos.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		tblCompromissos.setModel(new DefaultTableModel(new Object[][] {},
-				new String[] { "ID", "T\u00EDtulo", "Descri\u00E7\u00E3o", "Inicio", "T\u00E9rmino", "Local" }) {
-			Class[] columnTypes = new Class[] { Integer.class, String.class, String.class, String.class, String.class,
-					String.class };
-
+		tblCompromissos.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"ID", "T\u00EDtulo", "Descri\u00E7\u00E3o", "Inicio", "T\u00E9rmino", "Local"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				Integer.class, String.class, String.class, String.class, String.class, String.class
+			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
+			boolean[] columnEditables = new boolean[] {
+				false, false, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
 		});
+		tblCompromissos.getColumnModel().getColumn(0).setResizable(false);
 		tblCompromissos.getColumnModel().getColumn(0).setPreferredWidth(15);
 		tblCompromissos.getColumnModel().getColumn(0).setMinWidth(10);
+		tblCompromissos.getColumnModel().getColumn(1).setResizable(false);
+		tblCompromissos.getColumnModel().getColumn(2).setResizable(false);
+		tblCompromissos.getColumnModel().getColumn(3).setResizable(false);
+		tblCompromissos.getColumnModel().getColumn(4).setResizable(false);
+		tblCompromissos.getColumnModel().getColumn(5).setResizable(false);
 		scrollPane.setViewportView(tblCompromissos);
 
 		btnConvidados = new JButton("Convidados");
