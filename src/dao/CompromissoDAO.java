@@ -25,13 +25,12 @@ public class CompromissoDAO {
 
 		try {
 
-			st = this.conn.prepareStatement(
-					"select * from compromisso inner join agenda on agenda.usuario_id = compromisso.usuario_id where compromisso.usuario_id = ? and notificacao <= NOW()");
+			st = this.conn.prepareStatement("select * from compromisso where usuario_id = ?");
 			st.setInt(1, idUsuario);
 			rs = st.executeQuery();
 
 			List<Compromisso> listaCompromissos = new ArrayList<>();
-			
+
 			while (rs.next()) {
 				Compromisso compromisso = new Compromisso();
 				compromisso.setIdCompromisso(rs.getInt("id"));
@@ -54,7 +53,6 @@ public class CompromissoDAO {
 			BancoDados.desconectar();
 		}
 	}
-
 
 	public void cadastrarCompromisso(Compromisso compromisso, int idUsuario) throws SQLException {
 
@@ -148,7 +146,7 @@ public class CompromissoDAO {
 			BancoDados.desconectar();
 		}
 	}
-	
+
 	public Compromisso buscarCompromisso(int idCompromisso) throws SQLException {
 
 		PreparedStatement st = null;
@@ -214,7 +212,7 @@ public class CompromissoDAO {
 
 			if (rs.next()) {
 				st = conn.prepareStatement("select * from compromisso where id = ?");
-				st.setInt(1, rs.getInt("compromisso_id")); 
+				st.setInt(1, rs.getInt("compromisso_id"));
 				rs2 = st.executeQuery();
 
 				if (rs2.next()) {
@@ -241,7 +239,7 @@ public class CompromissoDAO {
 
 					convite.setConvidados(convidados);
 					convites.add(convite);
-				}	
+				}
 			}
 
 			return convites;
@@ -267,6 +265,21 @@ public class CompromissoDAO {
 
 		} finally {
 
+			BancoDados.finalizarStatement(st);
+			BancoDados.desconectar();
+		}
+	}
+
+	public void desativarNotificacao(int idCompromisso) throws SQLException {
+		PreparedStatement st = null;
+
+		try {
+			st = conn.prepareStatement("update compromisso set notificacao = NULL where id = ?");
+			st.setInt(1, idCompromisso);
+
+			st.executeUpdate();
+
+		} finally {
 			BancoDados.finalizarStatement(st);
 			BancoDados.desconectar();
 		}
@@ -298,16 +311,15 @@ public class CompromissoDAO {
 
 		try {
 			st = conn.prepareStatement(
-					"update compromisso set titulo = ?, descricao = ?, data_inicio = ?, data_termino = ?, local = ?, notificacao = ?, agenda_id = ?, usuario_id = ? where id = ?");
+					"update compromisso set titulo = ?, descricao = ?, data_inicio = ?, data_termino = ?, local = ?, notificacao = ?, usuario_id = ? where id = ?");
 			st.setString(1, compromisso.getTitulo());
 			st.setString(2, compromisso.getDescricao());
 			st.setTimestamp(3, compromisso.getDataInicio());
 			st.setTimestamp(4, compromisso.getDataTermino());
 			st.setString(5, compromisso.getLocal());
 			st.setTimestamp(6, compromisso.getNotificacao());
-			st.setInt(7, compromisso.getAgenda().getIdAgenda());
-			st.setInt(8, idUsuario);
-			st.setInt(9, compromisso.getIdCompromisso());
+			st.setInt(7, idUsuario);
+			st.setInt(8, compromisso.getIdCompromisso());
 			st.executeUpdate();
 
 			st = conn.prepareStatement("delete from compromisso_convidados where compromisso_id = ?");
@@ -328,10 +340,17 @@ public class CompromissoDAO {
 
 				for (int convidado : convidados) {
 					st = conn.prepareStatement(
-							"insert into compromisso_convidados (compromisso_id, usuario_id) values (?, ?)");
+							"select * from compromisso_convidados where compromisso_id = ? and usuario_id = ?");
 					st.setInt(1, compromisso.getIdCompromisso());
 					st.setInt(2, convidado);
-					st.executeUpdate();
+					rs = st.executeQuery();
+					if (!rs.next()) {
+						st = conn.prepareStatement(
+								"insert into compromisso_convidados (compromisso_id, usuario_id) values (?, ?)");
+						st.setInt(1, compromisso.getIdCompromisso());
+						st.setInt(2, convidado);
+						st.executeUpdate();
+					}
 				}
 			}
 		} finally {

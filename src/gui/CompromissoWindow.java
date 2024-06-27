@@ -28,8 +28,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
-import org.w3c.dom.Text;
-
 import entities.Agenda;
 import entities.Compromisso;
 import entities.Sessao;
@@ -86,7 +84,6 @@ public class CompromissoWindow extends JFrame {
 			return compromissoService.buscarCompromisso(idCompromisso);
 
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Erro ao obter compromisso", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 		return null;
@@ -120,8 +117,12 @@ public class CompromissoWindow extends JFrame {
 		Compromisso compromisso = this.buscarCompromisso((int) tblCompromissos
 				.getValueAt(tblCompromissos.getSelectedRow(), tblCompromissos.getColumnModel().getColumnIndex("ID")));
 		String convidados = "Convidados: ";
-		for (String convidado : compromisso.getConvidados()) {
-			convidados = convidados + "\n" + convidado;
+		if (compromisso.getConvidados().isEmpty()) {
+			convidados += "\n" + "nenhum";
+		} else {
+			for (String convidado : compromisso.getConvidados()) {
+				convidados += "\n" + convidado;
+			}
 		}
 		JOptionPane.showMessageDialog(null, convidados, "Convidados", JOptionPane.DEFAULT_OPTION);
 	}
@@ -155,6 +156,7 @@ public class CompromissoWindow extends JFrame {
 
 					compromissoService.cadastrarCompromisso(compromisso, Sessao.getUsuario().getIdUsuario());
 				}
+				br.close();
 				JOptionPane.showMessageDialog(this, "Compromissos salvos!", "Sucesso!",
 						JOptionPane.INFORMATION_MESSAGE);
 			}

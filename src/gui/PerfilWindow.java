@@ -43,10 +43,10 @@ public class PerfilWindow extends JFrame {
 	private JLabel lblBemVindo;
 
 	public PerfilWindow() {
-		iniciarNotificacao();
 		initComponents();
 		buscarConvites();
 		preencherDados();
+		iniciarNotificacao();
 	}
 
 	private void iniciarNotificacao() {
@@ -84,7 +84,6 @@ public class PerfilWindow extends JFrame {
 				lblConvite.setVisible(true);
 			}
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Erro ao obter convites", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}

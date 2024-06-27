@@ -77,16 +77,26 @@ public class CadastrarUsuarioWindow extends JFrame {
 
 	private void cadastrarUsuario() {
 		try {
+			if (txtNomeCompleto.getText().isBlank() || txtDataNasc.getText().isBlank() || txtEmail.getText().isBlank()
+					|| txtNomeUsuario.getText().isBlank() || (String.valueOf(txtSenha.getPassword()).isBlank())) {
+				JOptionPane.showMessageDialog(this, "Preencha os campos com dados válidos!", "Erro",
+						JOptionPane.ERROR_MESSAGE);
+
+				return;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 			Usuario usuario = new Usuario();
 
 			usuario.setNomeCompleto(txtNomeCompleto.getText());
-			usuario.setDataNascimento(new java.sql.Date(sdf.parse(this.txtDataNasc.getText()).getTime()));
+			usuario.setDataNascimento(new java.sql.Date(sdf.parse(txtDataNasc.getText()).getTime()));
 			usuario.setGenero(verificarRbGenero());
 			usuario.setEmail(txtEmail.getText());
-			usuario.setImagemPerfil(converterIconParaBytes(lblImagemPerfil.getIcon()));
 			usuario.setNomeUsuario(txtNomeUsuario.getText());
 			usuario.setSenha(String.valueOf(txtSenha.getPassword()));
+
+			if (lblImagemPerfil.getIcon() != null) {
+				usuario.setImagemPerfil(converterIconParaBytes(lblImagemPerfil.getIcon()));
+			}
 
 			usuarioService.cadastrarUsuario(usuario);
 
@@ -103,6 +113,13 @@ public class CadastrarUsuarioWindow extends JFrame {
 
 	private void editarUsuario() {
 		try {
+			if (txtNomeCompleto.getText().isBlank() || txtDataNasc.getText().isBlank() || txtEmail.getText().isBlank()
+					|| txtNomeUsuario.getText().isBlank() || (String.valueOf(txtSenha.getPassword()).isBlank())) {
+				JOptionPane.showMessageDialog(this, "Preencha os campos com dados válidos!", "Erro",
+						JOptionPane.ERROR_MESSAGE);
+
+				return;
+			}
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 			Usuario usuario = new Usuario();
 
@@ -110,9 +127,12 @@ public class CadastrarUsuarioWindow extends JFrame {
 			usuario.setDataNascimento(new java.sql.Date(sdf.parse(this.txtDataNasc.getText()).getTime()));
 			usuario.setGenero(verificarRbGenero());
 			usuario.setEmail(txtEmail.getText());
-			usuario.setImagemPerfil(converterIconParaBytes(lblImagemPerfil.getIcon()));
 			usuario.setNomeUsuario(txtNomeUsuario.getText());
 			usuario.setSenha(txtSenha.getPassword().toString());
+
+			if (lblImagemPerfil.getIcon() != null) {
+				usuario.setImagemPerfil(converterIconParaBytes(lblImagemPerfil.getIcon()));
+			}
 
 			this.usuarioService.editarUsuario(usuario);
 
@@ -122,7 +142,7 @@ public class CadastrarUsuarioWindow extends JFrame {
 			new PerfilWindow().setVisible(true);
 
 		} catch (ParseException | SQLException | IOException e) {
-			JOptionPane.showMessageDialog(this, "Erro ao realizar cadastro", "Erro", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Erro ao salvar cadastro", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
@@ -218,12 +238,12 @@ public class CadastrarUsuarioWindow extends JFrame {
 
 	private void voltar() {
 		this.dispose();
-		if(Sessao.getUsuario()==null) {
+		if (Sessao.getUsuario() == null) {
 			new LoginWindow().setVisible(true);
-		}else {
+		} else {
 			new PerfilWindow().setVisible(true);
 		}
-		
+
 	}
 
 	private void recuperarUsuario() {
@@ -239,7 +259,8 @@ public class CadastrarUsuarioWindow extends JFrame {
 				this.txtNomeCompleto.setText(Sessao.getUsuario().getNomeCompleto());
 				this.txtDataNasc.setValue(sdf.format(Sessao.getUsuario().getDataNascimento()));
 				this.txtEmail.setText(Sessao.getUsuario().getEmail());
-				this.txtNomeUsuario.setText(Sessao.getUsuario().getNomeCompleto());
+				this.txtNomeUsuario.setText(Sessao.getUsuario().getNomeUsuario());
+				this.txtNomeUsuario.setEnabled(false);
 				this.txtSenha.setText(Sessao.getUsuario().getSenha());
 				this.lblImagemPerfil.setIcon(converterBytesParaIcon(Sessao.getUsuario().getImagemPerfil()));
 				if (Sessao.getUsuario().getGenero().equals("Masculino")) {
@@ -365,7 +386,7 @@ public class CadastrarUsuarioWindow extends JFrame {
 		btnCadastrar.setBounds(222, 448, 129, 23);
 		contentPane.add(btnCadastrar);
 
-		lblTitulo = new JLabel("CADASTRAR NOVO USU�aRIO");
+		lblTitulo = new JLabel("CADASTRAR NOVO USUARIO");
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblTitulo.setBounds(20, 11, 340, 20);
 		contentPane.add(lblTitulo);

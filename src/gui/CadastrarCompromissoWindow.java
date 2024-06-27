@@ -2,11 +2,8 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -14,16 +11,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -66,9 +59,9 @@ public class CadastrarCompromissoWindow extends JFrame {
 	private JFormattedTextField txtHoraInicio;
 	private JLabel lblHoraFinal;
 	private JFormattedTextField txtHoraFinal;
-	private JComboBox cbNotificacao;
+	private JComboBox<String> cbNotificacao;
 	private JLabel lblConvidados;
-	private JList listaConvidados;
+	private JList<String> listaConvidados;
 
 	private MaskFormatter mascaraData;
 	private MaskFormatter mascaraHora;
@@ -89,7 +82,14 @@ public class CadastrarCompromissoWindow extends JFrame {
 
 	private void cadastrarOuEditarCompromisso() {
 		try {
+			if (txtTitulo.getText().isBlank() || (txtDescricao.getText().isBlank() || txtDataInicio.getText().isBlank()
+					|| txtHoraInicio.getText().isBlank() || txtDataFinal.getText().isBlank()
+					|| txtHoraFinal.getText().isBlank() || txtLocal.getText().isBlank())) {
+				JOptionPane.showMessageDialog(this, "Preencha os campos com dados válidos!", "Erro",
+						JOptionPane.ERROR_MESSAGE);
 
+				return;
+			}
 			Compromisso compromisso = new Compromisso();
 			compromisso.setTitulo(txtTitulo.getText());
 			compromisso.setDescricao(txtDescricao.getText());
@@ -98,7 +98,8 @@ public class CadastrarCompromissoWindow extends JFrame {
 			compromisso.setAgenda(agenda);
 			compromisso.setLocal(txtLocal.getText());
 			compromisso.setConvidados(listaConvidados.getSelectedValuesList());
-			compromisso.setNotificacao(verificarNotificacao(converterTimestamp(txtDataInicio.getText(), txtHoraInicio.getText())));
+			compromisso.setNotificacao(
+					verificarNotificacao(converterTimestamp(txtDataInicio.getText(), txtHoraInicio.getText())));
 
 			if (this.compromissoAtual == null) {
 				compromissoService.cadastrarCompromisso(compromisso, Sessao.getUsuario().getIdUsuario());
@@ -106,7 +107,8 @@ public class CadastrarCompromissoWindow extends JFrame {
 				compromisso.setIdCompromisso(compromissoAtual.getIdCompromisso());
 				compromissoService.editarCompromisso(compromisso, Sessao.getUsuario().getIdUsuario());
 			}
-			JOptionPane.showMessageDialog(this, "Compromisso salvo com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Compromisso salvo com sucesso!", "Sucesso!",
+					JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 			new CompromissoWindow(agenda).setVisible(true);
 
@@ -115,30 +117,16 @@ public class CadastrarCompromissoWindow extends JFrame {
 		}
 
 	}
-	
-	private byte[] converterIconParaBytes(Icon icon) throws IOException {
-
-		Image image = ((ImageIcon) icon).getImage();
-
-		BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
-				BufferedImage.TYPE_INT_ARGB);
-		bufferedImage.getGraphics().drawImage(image, 0, 0, null);
-
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-			ImageIO.write(bufferedImage, "png", baos);
-			return baos.toByteArray();
-		}
-	}
 
 	private void buscarUsuarios() {
 		try {
-			DefaultListModel model = new DefaultListModel();
+			DefaultListModel<String> model = new DefaultListModel<String>();
 
 			List<String> usuarios;
 			usuarios = usuarioService.buscarUsuarios();
 
 			for (String usuario : usuarios) {
-				if(!usuario.equals(Sessao.getUsuario().getNomeUsuario())) {
+				if (!usuario.equals(Sessao.getUsuario().getNomeUsuario())) {
 					model.addElement(usuario);
 				}
 			}
@@ -167,13 +155,13 @@ public class CadastrarCompromissoWindow extends JFrame {
 	private Timestamp verificarNotificacao(Timestamp data) {
 		Instant ins = data.toInstant();
 		if (cbNotificacao.getSelectedIndex() == 1) {
-			ins.minusSeconds(900);
+			ins = ins.minusSeconds(900);
 		} else if (cbNotificacao.getSelectedIndex() == 2) {
-			ins.minusSeconds(1800);
+			ins = ins.minusSeconds(1800);
 		} else {
-			ins.minusSeconds(3600);
+			ins = ins.minusSeconds(3600);
 		}
-		
+
 		return Timestamp.from(ins);
 	}
 
@@ -187,19 +175,25 @@ public class CadastrarCompromissoWindow extends JFrame {
 	}
 
 	public void preencherCampos(Compromisso compromisso) {
+		SimpleDateFormat sdfData = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm");
 		btnCadastrar.setText("Salvar");
 		lblTituloPagina.setText("EDITAR COMPROMISSO");
 		txtTitulo.setText(compromisso.getTitulo());
 		txtDescricao.setText(compromisso.getDescricao());
 		txtLocal.setText(compromisso.getLocal());
+		txtDataInicio.setText(sdfData.format(compromisso.getDataInicio()));
+		txtDataFinal.setText(sdfData.format(compromisso.getDataTermino()));
+		txtHoraInicio.setText(sdfHora.format(compromisso.getDataInicio()));
+		txtHoraFinal.setText(sdfHora.format(compromisso.getDataTermino()));
 		this.compromissoAtual = compromisso;
-		
+
 		int[] indices = new int[compromisso.getConvidados().size()];
-        int counter = 0;
-		for(int i=0; i<listaConvidados.getModel().getSize(); i++) {
-			if(compromisso.getConvidados().contains(listaConvidados.getModel().getElementAt(i))) {
+		int counter = 0;
+		for (int i = 0; i < listaConvidados.getModel().getSize(); i++) {
+			if (compromisso.getConvidados().contains(listaConvidados.getModel().getElementAt(i))) {
 				indices[counter] = i;
-                counter++;
+				counter++;
 			}
 		}
 		listaConvidados.setSelectedIndices(indices);

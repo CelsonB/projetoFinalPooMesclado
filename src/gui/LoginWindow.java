@@ -34,21 +34,26 @@ public class LoginWindow extends JFrame {
 	private JLabel lblLogin;
 	private JSeparator separator;
 
-	private UsuarioService usuarioService = new UsuarioService();;
+	private UsuarioService usuarioService = new UsuarioService();
 
 	public LoginWindow() {
 		initComponents();
 	}
 
 	private void realizarLogin() {
-		
 		try {
-			Usuario usuario = usuarioService.realizarLogin(txtNomeUsuario.getText(), String.valueOf(txtSenha.getPassword()));
-			if(usuario == null) {
+			if (txtNomeUsuario.getText().isBlank() || String.valueOf(txtSenha.getPassword()).isBlank()) {
+				JOptionPane.showMessageDialog(null, "Preencha os campos com valores válidos!", "Erro",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			Usuario usuario = usuarioService.realizarLogin(txtNomeUsuario.getText(),
+					String.valueOf(txtSenha.getPassword()));
+			if (usuario == null) {
 				JOptionPane.showMessageDialog(null, "Usuário ou senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
 				txtNomeUsuario.setText(null);
 				txtSenha.setText(null);
-			}else {
+			} else {
 				Sessao.setUsuario(usuario);
 				this.dispose();
 				new PerfilWindow().setVisible(true);
@@ -57,7 +62,7 @@ public class LoginWindow extends JFrame {
 			JOptionPane.showMessageDialog(null, "Erro ao realizar login", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
+
 	private void abrirCadastrar() {
 		this.dispose();
 		new CadastrarUsuarioWindow().setVisible(true);

@@ -152,7 +152,7 @@ public class AgendaWindow extends JFrame {
 			}
 		});
 		btnCriarAgenda.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnCriarAgenda.setBounds(626, 94, 101, 23);
+		btnCriarAgenda.setBounds(626, 109, 101, 23);
 		contentPane.add(btnCriarAgenda);
 
 		btnEditarAgenda = new JButton("Editar");
@@ -162,7 +162,7 @@ public class AgendaWindow extends JFrame {
 			}
 		});
 		btnEditarAgenda.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnEditarAgenda.setBounds(626, 128, 101, 23);
+		btnEditarAgenda.setBounds(626, 143, 101, 23);
 		contentPane.add(btnEditarAgenda);
 
 		btnExcluirAgenda = new JButton("Excluir");
@@ -172,7 +172,7 @@ public class AgendaWindow extends JFrame {
 			}
 		});
 		btnExcluirAgenda.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnExcluirAgenda.setBounds(626, 162, 101, 23);
+		btnExcluirAgenda.setBounds(626, 177, 101, 23);
 		contentPane.add(btnExcluirAgenda);
 
 		btnVoltar = new JButton("Voltar");
@@ -228,7 +228,7 @@ public class AgendaWindow extends JFrame {
 			}
 		});
 		btnAbrir.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnAbrir.setBounds(626, 60, 101, 23);
+		btnAbrir.setBounds(626, 75, 101, 23);
 		contentPane.add(btnAbrir);
 		
 		btnConvites = new JButton("Convites");
@@ -238,7 +238,7 @@ public class AgendaWindow extends JFrame {
 			}
 		});
 		btnConvites.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnConvites.setBounds(626, 196, 101, 23);
+		btnConvites.setBounds(626, 211, 101, 23);
 		contentPane.add(btnConvites);
 
 

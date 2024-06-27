@@ -42,6 +42,12 @@ public class CadastrarAgendaWindow extends JDialog {
 
 	private void cadastrarOuEditarAgenda() {
 		try {
+			if (txtNome.getText().isBlank() || txtDescricao.getText().isBlank()) {
+				JOptionPane.showMessageDialog(this, "Preencha os campos com dados válidos!", "Erro",
+						JOptionPane.ERROR_MESSAGE);
+
+				return;
+			}
 			Agenda agenda = new Agenda();
 
 			agenda.setNome(txtNome.getText());
@@ -54,13 +60,13 @@ public class CadastrarAgendaWindow extends JDialog {
 				agenda.setIdAgenda(agendaAtual.getIdAgenda());
 				agendaService.editarAgenda(agenda);
 			}
-			JOptionPane.showMessageDialog(this, "Salvo com sucesso!", "Sucesso!",
-					JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Salvo com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 
 		} catch (SQLException | IOException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Erro ao salvar agenda", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
+
 	}
 
 	private void initComponets() {

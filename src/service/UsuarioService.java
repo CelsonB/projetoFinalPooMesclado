@@ -6,9 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import dao.BancoDados;
-import dao.CompromissoDAO;
 import dao.UsuarioDAO;
-import entities.Compromisso;
 import entities.Sessao;
 import entities.Usuario;
 

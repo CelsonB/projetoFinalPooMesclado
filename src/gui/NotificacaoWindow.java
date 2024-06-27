@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import entities.Compromisso;
+import entities.Sessao;
 import service.CompromissoService;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -39,24 +40,30 @@ public class NotificacaoWindow extends JDialog {
 	private void mostrarNotificacao() {
 		try {
 			for (Compromisso compromisso : compromissos) {
+				if (compromisso.getNotificacao() == null) {
+					continue;
+				}
 				
+				if (System.currentTimeMillis() <= compromisso.getNotificacao().getTime()) {
+					continue;
+				}
+
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 				sdf.setTimeZone(TimeZone.getTimeZone("America/Sao_Paulo"));
 				String dataInicio = sdf.format(compromisso.getDataInicio());
-				
+
 				lblHora.setText(dataInicio);
-				
+
 				Toolkit.getDefaultToolkit().beep();
 
 				this.setVisible(true);
-				compromissoService.excluirCompromisso(compromisso.getIdCompromisso());
-				
+				compromissoService.desativarNotificacao(compromisso.getIdCompromisso());
 			}
 		} catch (SQLException | IOException e) {
 			JOptionPane.showMessageDialog(null, "Erro ao exibir notificação", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
+
 	private void esconderNotificacao() {
 		this.dispose();
 	}
@@ -87,5 +94,7 @@ public class NotificacaoWindow extends JDialog {
 		btnConfirmar.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnConfirmar.setBounds(97, 109, 116, 23);
 		getContentPane().add(btnConfirmar);
+		
+		setLocationRelativeTo(null);
 	}
 }

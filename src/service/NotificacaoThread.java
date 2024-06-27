@@ -14,14 +14,11 @@ public class NotificacaoThread extends Thread {
 	private List<Compromisso> compromissos = new ArrayList<>();
 	private CompromissoService compromissoService = new CompromissoService();
 
-	public NotificacaoThread() {
-		verificarCompromissos();
-	}
+	public NotificacaoThread() { }
 
 	private void verificarCompromissos() {
 		try {
 			this.compromissos = compromissoService.verificarCompromisso(Sessao.getUsuario().getIdUsuario());
-
 		} catch (SQLException | IOException e) {
 			e.printStackTrace();
 		}
@@ -30,6 +27,10 @@ public class NotificacaoThread extends Thread {
 	@Override
 	public void run() {
 		while (true) {
+			if (Sessao.getUsuario() == null) {
+				break;
+			}
+			
 			try {
 				verificarCompromissos();
 				if (compromissos != null) {

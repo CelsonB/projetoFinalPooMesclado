@@ -25,7 +25,6 @@ import javax.swing.table.DefaultTableModel;
 import entities.Agenda;
 import entities.Compromisso;
 import entities.Sessao;
-import service.AgendaService;
 import service.CompromissoService;
 
 public class ConvitesWindow extends JFrame {
@@ -69,18 +68,27 @@ public class ConvitesWindow extends JFrame {
 						dataInicio, dataTermino, convite.getLocal() });
 			}
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Erro ao obter convites", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	private void aceitarConvite() {
 		try {
+			if (agendas.isEmpty()) {
+				
+				JOptionPane.showMessageDialog(this, "Crie uma agenda para adicionar seus compromissos!",
+						"Agenda não encontrada", JOptionPane.INFORMATION_MESSAGE);
 
-			JComboBox<Agenda> comboBox = new JComboBox<>();
-			DefaultComboBoxModel<Agenda> model = new DefaultComboBoxModel();
+			} else if (this.tblConvites.getSelectedRow() == -1) {
+				
+				JOptionPane.showMessageDialog(null, "Selecione uma linha na tabela", "Erro", JOptionPane.ERROR_MESSAGE);
+				return;
 
-			if (!agendas.isEmpty()) {
+			} else {
+				
+				JComboBox<Agenda> comboBox = new JComboBox<>();
+				DefaultComboBoxModel<Agenda> model = new DefaultComboBoxModel<Agenda>();
+				
 				for (Agenda agenda : agendas) {
 					model.addElement(agenda);
 				}
@@ -100,7 +108,8 @@ public class ConvitesWindow extends JFrame {
 								tblConvites.getSelectedRow(), tblConvites.getColumnModel().getColumnIndex("ID")))) {
 							convite.setAgenda(agendaSelecionada);
 							convite.setConvidados(null);
-							compromissoService.aceitarConvite(convite.getIdCompromisso(), Sessao.getUsuario().getIdUsuario());
+							compromissoService.aceitarConvite(convite.getIdCompromisso(),
+									Sessao.getUsuario().getIdUsuario());
 							compromissoService.cadastrarCompromisso(convite, Sessao.getUsuario().getIdUsuario());
 						}
 					}
@@ -109,31 +118,28 @@ public class ConvitesWindow extends JFrame {
 							JOptionPane.INFORMATION_MESSAGE);
 				}
 				buscarConvites();
-			}else {
-				JOptionPane.showMessageDialog(this, "Crie uma agenda para adicionar seu compromisso!", "Agenda não encontrada",
-						JOptionPane.INFORMATION_MESSAGE);
 			}
 
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Erro ao salvar compromisso", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	private void recusarConvite() {
 		try {
-			int idCompromisso = compromissoService.excluirCompromisso((Integer) tblConvites
-					.getValueAt(tblConvites.getSelectedRow(), tblConvites.getColumnModel().getColumnIndex("ID")));
-			if (idCompromisso != -1) {
-				compromissoService.recusarConvite(idCompromisso, Sessao.getUsuario().getIdUsuario());
-			} else {
-				JOptionPane.showMessageDialog(null, "Selecione uma linha da tabela!", null,
-						JOptionPane.INFORMATION_MESSAGE);
+			if (this.tblConvites.getSelectedRow() == -1) {
+				JOptionPane.showMessageDialog(null, "Selecione uma linha na tabela", "Erro", JOptionPane.ERROR_MESSAGE);
+				return;
 			}
+			compromissoService
+					.recusarConvite(
+							((Integer) tblConvites.getValueAt(tblConvites.getSelectedRow(),
+									tblConvites.getColumnModel().getColumnIndex("ID"))),
+							Sessao.getUsuario().getIdUsuario());
+
 			buscarConvites();
 
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Erro ao recusar convite", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 	}
