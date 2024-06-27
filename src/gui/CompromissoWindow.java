@@ -182,7 +182,7 @@ public class CompromissoWindow extends JFrame {
 				File fileToSave = fileChooser.getSelectedFile();
 
 				BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave));
-				writer.write("Título,Descrição,Data Início,Data Término,Local,Agenda Nome\n");
+				writer.write("Título,Descrição,Data Início,Data Término,Local,Agenda\n");
 
 				for (Compromisso compromisso : compromissos) {
 
@@ -191,7 +191,7 @@ public class CompromissoWindow extends JFrame {
 					writer.write("\"" + compromisso.getDataInicio() + "\",");
 					writer.write("\"" + compromisso.getDataTermino() + "\",");
 					writer.write("\"" + compromisso.getLocal() + "\",");
-					writer.write("\"" + agenda.getNome() + "\",");
+					writer.write("\"" + agenda.getNome() + "\"");
 					writer.newLine();
 				}
 
